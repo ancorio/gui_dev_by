@@ -6,6 +6,7 @@ public class Rect { // прямоугольник
 	public int top;
 	public int width;
 	public int height;
+	
 	public Rect(int left, int top, int width, int height) {
 		this.left = left;
 		this.top = top;
@@ -20,4 +21,8 @@ public class Rect { // прямоугольник
 		this.height = rect.height;
 	}
 	
+	
+	public boolean contains(Point point) {
+		return left <= point.x && left + width > point.x && top <= point.y && top + height > point.y; 
+	}
 }
