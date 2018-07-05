@@ -9,15 +9,11 @@ import by.dev.gui.node.FillNode;
 
 public class Window extends FillNode {
 	
-	final int HEADER_HEIGHT = 30;
+	final int HEADER_HEIGHT = 20;
 	final int BORDER = 2;
 	
-	public Window() {
-		super();
-		setBackgroundColor(new Color(240, 240, 120));
-		addButtons();
-	}
-
+	private boolean active = false;
+	
 	public Window(Rect frame) {
 		super(frame);
 		setBackgroundColor(new Color(240, 240, 120));
@@ -26,21 +22,43 @@ public class Window extends FillNode {
 	
 	public void addButtons() {
 		int size = HEADER_HEIGHT - BORDER * 3;
-		Button closeButton = new Button(new Rect(frame.width - BORDER * 2 - size, BORDER * 2, size, size));
+		Button closeButton = new Button(new Rect(getFrame().getWidth() - BORDER * 2 - size, BORDER * 2, size, size));
 		addSubnode(closeButton);
 		closeButton.callback = new Runnable() {
-			
 			public void run() {
 				removeFromParent();
 			}
 		};
+		Button incAplhaButton = new Button(new Rect(20, 50, 40, 40));
+		addSubnode(incAplhaButton);
+		incAplhaButton.callback = new Runnable() {
+			public void run() {
+				incAplha();
+			}
+		};
+
+		Button decAplhaButton = new Button(new Rect(80, 50, 40, 40));
+		addSubnode(decAplhaButton);
+		decAplhaButton.callback = new Runnable() {
+			public void run() {
+				decAplha();
+			}
+		};
+	}
+
+	private void incAplha() {
+		alpha = Math.min(alpha + 25, 255);
+	}
+
+	private void decAplha() {
+		alpha = Math.max(alpha - 25, 10);
 	}
 
 	protected void drawMe(GraphicsContext ctx) {
 		super.drawMe(ctx);
 		Color headerColor;
-		if (parent.childs.indexOf(this) == parent.childs.size() - 1) {
-			headerColor = new Color(240, 255, 200);
+		if (active) {
+			headerColor = new Color(255, 80, 80);
 		} else {
 			headerColor = new Color(200, 255, 170);
 		}
@@ -50,22 +68,24 @@ public class Window extends FillNode {
 		headerColor.g /= 2;
 		headerColor.b /= 2;
 		
-		ctx.fill(new Rect(0, 0, frame.width, BORDER), headerColor);
-		ctx.fill(new Rect(0, 0, BORDER, frame.height), headerColor);
-		ctx.fill(new Rect(frame.width - BORDER, 0, BORDER, frame.height), headerColor);
+		Rect frame = getFrame();
+		
+		ctx.fill(new Rect(0, 0, frame.getWidth(), BORDER), headerColor);
+		ctx.fill(new Rect(0, 0, BORDER, frame.getHeight()), headerColor);
+		ctx.fill(new Rect(frame.getWidth() - BORDER, 0, BORDER, frame.getHeight()), headerColor);
 		
 		Rect cb = getContentBounds();
 		
-		ctx.fill(new Rect(cb.left, cb.top, cb.width, BORDER), headerColor);
-		ctx.fill(new Rect(cb.left, cb.top + cb.height - BORDER, cb.width, BORDER), headerColor);
+		ctx.fill(new Rect(cb.getLeft(), cb.getTop(), cb.getWidth(), BORDER), headerColor);
+		ctx.fill(new Rect(cb.getLeft(), cb.getTop() + cb.getHeight() - BORDER, cb.getWidth(), BORDER), headerColor);
 	}
 
 	private Rect getHeaderBounds() {
-		return new Rect(0, 0, frame.width, HEADER_HEIGHT);
+		return new Rect(0, 0, getFrame().getWidth(), HEADER_HEIGHT);
 	}
 	
 	private Rect getContentBounds() {
-		return new Rect(0, HEADER_HEIGHT, frame.width, frame.height - HEADER_HEIGHT);
+		return new Rect(0, HEADER_HEIGHT, getFrame().getWidth(), getFrame().getHeight() - HEADER_HEIGHT);
 	}
 	
 	private Point dragPoint = null;
@@ -84,8 +104,9 @@ public class Window extends FillNode {
 			case DRAG: {
 				if (dragging) {
 					Point location = event.locationInNode(this.getDesktop());
-					frame.left += location.x - dragPoint.x;
-					frame.top +=  location.y - dragPoint.y;
+					Rect frame = getFrame();
+					frame = new Rect(frame.getLeft() + location.x - dragPoint.x, frame.getTop() + location.y - dragPoint.y, frame.getWidth(), frame.getHeight());
+					setFrame(frame);
 					dragPoint = location;
 				}
 				return true;
@@ -97,5 +118,15 @@ public class Window extends FillNode {
 		}
 		return false;
 	}
+	
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+		setNeedsRedraw();
+	}
+
 
 }

@@ -10,10 +10,6 @@ public class Button extends Node {
 	
 	public Runnable callback;
 
-	public Button() {
-		super();
-	}
-
 	public Button(Rect frame) {
 		super(frame);
 	}
@@ -42,6 +38,7 @@ public class Button extends Node {
 			case PRESS: {
 				if (getBounds().contains(event.locationInNode(this))) {
 					active = true;
+					setNeedsRedraw();
 					return true;
 				} else {
 					return false;
@@ -54,16 +51,18 @@ public class Button extends Node {
 					}
 				}
 				active = false;
+				setNeedsRedraw();
 				return false;
 			}
 			case RELEASE: {
 				if (active) {
 					if (getBounds().contains(event.locationInNode(this))) {
 						if (callback != null) {
-							callback.run();
+							getRuntime().invokeLater(callback);
 						}
 					}
 					active = false;
+					setNeedsRedraw();
 				}
 				return false;
 			}

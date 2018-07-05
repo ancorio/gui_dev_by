@@ -10,11 +10,8 @@ public class SafeGraphicsContext extends GraphicsContext {
 		super(videoDevice);
 	}
 	
-	
 	public void setPixelColor(Point point, Color color) {
-		int x = offset.x + point.x;
-		int y = offset.y + point.y;
-		if (videoDevice.getBounds().contains(new Point(x, y))) {
+		if (videoDevice.getBounds().contains(point)) {
 			super.setPixelColor(point, color);
 		}
 	}

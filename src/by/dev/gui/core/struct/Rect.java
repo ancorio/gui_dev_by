@@ -1,11 +1,11 @@
 package by.dev.gui.core.struct;
 
-public class Rect { // прямоугольник
+public class Rect {
 	
-	public int left;
-	public int top;
-	public int width;
-	public int height;
+	private int left;
+	private int top;
+	private int width;
+	private int height;
 	
 	public Rect(int left, int top, int width, int height) {
 		this.left = left;
@@ -21,8 +21,29 @@ public class Rect { // прямоугольник
 		this.height = rect.height;
 	}
 	
-	
 	public boolean contains(Point point) {
 		return left <= point.x && left + width > point.x && top <= point.y && top + height > point.y; 
 	}
+
+	public int getLeft() {
+		return left;
+	}
+	
+	public int getTop() {
+		return top;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public boolean equals(Object texture) {
+		Rect r = (Rect)texture;
+		return r.left == this.left && r.top == this.top && r.width == this.width && r.height == this.height;
+	}
+	
 }

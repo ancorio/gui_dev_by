@@ -10,6 +10,8 @@ import by.dev.gui.node.Node;
 public class Desktop extends FillNode implements MouseDeviceCallback {
 	
 	private Node touchFocus = null;
+	private Window activeWindow = null;
+	private by.dev.gui.Runtime runtime;
 	
 	public Desktop(int width, int height) {
 		super(new Rect(0, 0, width, height));
@@ -50,13 +52,55 @@ public class Desktop extends FillNode implements MouseDeviceCallback {
 		if (window != null && window.parent == this) {
 			childs.remove(window);
 			childs.add(window);
+			checkActiveWindow();
 		}
 	}
 	
 	private void createWindow() {
-		Window window = new Window(new Rect(80 + childs.size() * 30, 40 + childs.size() * 30, 300, 200));
+		Window window = new Window(new Rect(80 + childs.size() * 30, 40 + childs.size() * 30, 200, 160));
 		addSubnode(window);
 	}
-	
 
+	public void addSubnode(Node node) {
+		super.addSubnode(node);
+		checkActiveWindow();
+	}
+
+	public void removeSubnode(Node node) {
+		super.removeSubnode(node);
+		checkActiveWindow();
+	}
+
+	private void checkActiveWindow() {
+		Window window = null;
+		for (Node node : childs) {
+			if (Window.class.isAssignableFrom(node.getClass())) {
+				window = (Window)node;
+			}
+		}
+		if (window == null) {
+			if (activeWindow != null) {
+				activeWindow.setActive(false);
+				activeWindow = null;
+			}
+		} else {
+			if (window != activeWindow) {
+				if (activeWindow != null) {
+					activeWindow.setActive(false);
+				}
+				activeWindow = window;
+				activeWindow.setActive(true);
+			}
+		}
+	}
+
+
+	public by.dev.gui.Runtime getRuntime() {
+		return runtime;
+	}
+
+	public void setRuntime(by.dev.gui.Runtime runtime) {
+		this.runtime = runtime;
+	}
+	
 }

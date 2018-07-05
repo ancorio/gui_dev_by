@@ -19,8 +19,8 @@ public class MouseEvent {
 	public Point locationInNode(Node node) {
 		Point result = new Point(x, y);
 		while (node != null) {
-			result.x -= node.frame.left;
-			result.y -= node.frame.top;
+			result.x -= node.getFrame().getLeft();
+			result.y -= node.getFrame().getTop();
 			node = node.parent;
 		}
 		return result;

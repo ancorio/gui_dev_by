@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import by.dev.gui.core.render.GraphicsContext;
 import by.dev.gui.core.render.SafeGraphicsContext;
+import by.dev.gui.core.struct.Point;
 import by.dev.gui.driver.MouseDeviceCallback;
 import by.dev.gui.driver.impl.Monitor;
 import by.dev.gui.driver.impl.MouseEvent;
@@ -21,13 +22,14 @@ public class Runtime extends Thread implements MouseDeviceCallback {
 	private LinkedList <Runnable> invokeQueue = new LinkedList<>();
 	
 	public void start() {
-		final int width = 1024;
-		final int height = 768;
+		final int width = 800;
+		final int height = 600;
 		
 		window = new MainFrame(300, 200, width, height);
 		window.setVisible(true);
 		monitor = new Monitor(width, height);
 		desktop = new Desktop(width, height);
+		desktop.setRuntime(this);
 		window.setMouseCallback(this);
 		super.start();
 	}
@@ -57,7 +59,7 @@ public class Runtime extends Thread implements MouseDeviceCallback {
 		}
 	}
 	
-	private void invokeLater(Runnable runnable) {
+	public void invokeLater(Runnable runnable) {
 		synchronized (invokeQueue) {
 			invokeQueue.add(runnable);
 		}
@@ -65,8 +67,9 @@ public class Runtime extends Thread implements MouseDeviceCallback {
 	}
 	
 	private void draw() {
+		desktop.draw();
 		GraphicsContext ctx = new SafeGraphicsContext(monitor);
-		desktop.draw(ctx);
+		ctx.drawTexture(new Point(0, 0), desktop.getContext().getTexture());
 	}
 	
 	private void renderOnMonitor() {

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 import by.dev.gui.core.render.GraphicsContext;
+import by.dev.gui.core.render.Texture;
+import by.dev.gui.core.render.TextureGraphicsContext;
 import by.dev.gui.core.struct.Point;
 import by.dev.gui.core.struct.Rect;
 import by.dev.gui.driver.impl.MouseEvent;
@@ -14,18 +16,19 @@ import by.dev.gui.node.impl.Window;
 
 public class Node {
 
-	public Rect frame;
+	private Rect frame;
 	public List<Node> childs;
 	public Node parent = null;
-	
-	public Node() {
-		this(new Rect(0, 0, 0, 0));
-	}
+	public int alpha = 255;
+	private TextureGraphicsContext context;
+	private boolean needsRedraw = true;
 	
 	public Node(Rect frame) {
 		super();
 		this.childs = new ArrayList<>();
-		this.frame = new Rect(frame);
+		this.frame = frame;
+		this.context = new TextureGraphicsContext(new Texture(), getBounds());
+		
 	}
 	
 	public void addSubnode(Node node) {
@@ -43,6 +46,7 @@ public class Node {
 		}
 		childs.add(node);
 		node.parent = this;
+		setNeedsRedraw();
 	}
 	
 	public void removeSubnode(Node node) {
@@ -63,18 +67,24 @@ public class Node {
 	protected void drawMe(GraphicsContext ctx) {
 	}
 	
-	public void draw(GraphicsContext ctx) {
-		ctx.translate(new Point(frame.left, frame.top));
-	    drawMe(ctx);
-	    for (Node subnode : childs) {
-	    	subnode.draw(ctx);
-	    }
-		ctx.translate(new Point(-frame.left, -frame.top));
+	public void draw() {
+		if (needsRedraw) {
+		    drawMe(context);
+		    for (Node subnode : childs) {
+		    	subnode.draw();
+		    	if (subnode.alpha == 255) {
+		    		context.drawTexture(new Point(subnode.getFrame().getLeft(), subnode.getFrame().getTop()), subnode.context.getTexture());	    		
+		    	} else {
+		    		context.drawTexture(new Point(subnode.getFrame().getLeft(), subnode.getFrame().getTop()), subnode.context.getTexture(), subnode.alpha);
+		    	}	
+		    }
+			needsRedraw = false;
+		}
 	}
 	
 	static protected Point getScreenPosition(Point point, Node node) { 
-		point.x += node.frame.left;
-		point.y += node.frame.top;
+		point.x += node.frame.getLeft();
+		point.y += node.frame.getTop();
 		if (node.parent == null) {
 			return point;
 		} else {
@@ -87,7 +97,7 @@ public class Node {
 	}
 	
 	public boolean isInBounds(Point point) {
-		return point.x >= 0 && point.y >= 0 && point.x < frame.width && point.y < frame.height;
+		return point.x >= 0 && point.y >= 0 && point.x < frame.getWidth() && point.y < frame.getHeight();
 	}
 
 	public Node nodeForMouseEvent(MouseEvent event) {
@@ -129,7 +139,33 @@ public class Node {
 	}
 	
 	public Rect getBounds() {
-		return new Rect(0, 0, frame.width, frame.height);
+		return new Rect(0, 0, frame.getWidth(), frame.getHeight());
 	}
 
+	public Rect getFrame() {
+		return frame;
+	}
+
+	public void setFrame(Rect frame) {
+		this.frame = frame;
+		context.updateBounds(getBounds());
+		setNeedsRedraw();
+	}
+	
+	public void setNeedsRedraw() {
+		Node node = this;
+		while (node != null) {
+			node.needsRedraw = true;
+			node = node.parent;
+		}
+	}
+
+	public TextureGraphicsContext getContext() {
+		return context;
+	}
+	
+	public by.dev.gui.Runtime getRuntime() {
+		return getDesktop().getRuntime();
+	}
+	
 }

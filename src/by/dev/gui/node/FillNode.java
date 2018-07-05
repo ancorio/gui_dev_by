@@ -8,10 +8,6 @@ public class FillNode extends Node {
 	
 	private Color backgroundColor = null;
 
-	public FillNode() {
-		super();
-	}
-
 	public FillNode(Rect frame) {
 		super(frame);
 	}
