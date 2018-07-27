@@ -58,7 +58,7 @@ public class Button extends Node {
 				if (active) {
 					if (getBounds().contains(event.locationInNode(this))) {
 						if (callback != null) {
-							getRuntime().invokeLater(callback);
+							getApplication().invokeLater(callback);
 						}
 					}
 					active = false;

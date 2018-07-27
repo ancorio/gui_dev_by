@@ -9,49 +9,14 @@ import by.dev.gui.node.FillNode;
 
 public class Window extends FillNode {
 	
-	final int HEADER_HEIGHT = 20;
-	final int BORDER = 2;
+	protected final int HEADER_HEIGHT = 20;
+	protected final int BORDER = 2;
 	
 	private boolean active = false;
 	
 	public Window(Rect frame) {
 		super(frame);
 		setBackgroundColor(new Color(240, 240, 120));
-		addButtons();
-	}
-	
-	public void addButtons() {
-		int size = HEADER_HEIGHT - BORDER * 3;
-		Button closeButton = new Button(new Rect(getFrame().getWidth() - BORDER * 2 - size, BORDER * 2, size, size));
-		addSubnode(closeButton);
-		closeButton.callback = new Runnable() {
-			public void run() {
-				removeFromParent();
-			}
-		};
-		Button incAplhaButton = new Button(new Rect(20, 50, 40, 40));
-		addSubnode(incAplhaButton);
-		incAplhaButton.callback = new Runnable() {
-			public void run() {
-				incAplha();
-			}
-		};
-
-		Button decAplhaButton = new Button(new Rect(80, 50, 40, 40));
-		addSubnode(decAplhaButton);
-		decAplhaButton.callback = new Runnable() {
-			public void run() {
-				decAplha();
-			}
-		};
-	}
-
-	private void incAplha() {
-		alpha = Math.min(alpha + 25, 255);
-	}
-
-	private void decAplha() {
-		alpha = Math.max(alpha - 25, 10);
 	}
 
 	protected void drawMe(GraphicsContext ctx) {

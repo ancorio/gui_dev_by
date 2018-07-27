@@ -14,11 +14,11 @@ import by.dev.gui.driver.impl.MouseEvent;
 import by.dev.gui.driver.impl.MouseEventInvoke;
 import by.dev.gui.node.impl.Desktop;
 
-public class Runtime extends Thread implements MouseDeviceCallback {
+public class Application extends Thread implements MouseDeviceCallback {
 	
-	private MainFrame window;
-	private Monitor monitor;
-	private Desktop desktop;
+	protected MainFrame window;
+	protected Monitor monitor;
+	protected Desktop desktop;
 	private LinkedList <Runnable> invokeQueue = new LinkedList<>();
 	
 	public void start() {
@@ -29,7 +29,7 @@ public class Runtime extends Thread implements MouseDeviceCallback {
 		window.setVisible(true);
 		monitor = new Monitor(width, height);
 		desktop = new Desktop(width, height);
-		desktop.setRuntime(this);
+		desktop.setApplication(this);
 		window.setMouseCallback(this);
 		super.start();
 	}
@@ -38,7 +38,7 @@ public class Runtime extends Thread implements MouseDeviceCallback {
 		while (true) {
 			invokes();
 			draw();
-			renderOnMonitor();
+			renderOnDevice();
 		}
 	}
 	
@@ -72,11 +72,13 @@ public class Runtime extends Thread implements MouseDeviceCallback {
 		ctx.drawTexture(new Point(0, 0), desktop.getContext().getTexture());
 	}
 	
-	private void renderOnMonitor() {
+	private BufferedImage image = null;
+	
+	private void renderOnDevice() {
+		image = monitor.getImage();
 		try {
-			SwingUtilities.invokeAndWait(new Runnable() {
+			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					BufferedImage image = monitor.getImage();
 					window.setImage(image);
 				}
 			});

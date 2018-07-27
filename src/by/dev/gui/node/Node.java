@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import by.dev.gui.Application;
 import by.dev.gui.core.render.GraphicsContext;
 import by.dev.gui.core.render.Texture;
 import by.dev.gui.core.render.TextureGraphicsContext;
@@ -19,7 +20,7 @@ public class Node {
 	private Rect frame;
 	public List<Node> childs;
 	public Node parent = null;
-	public int alpha = 255;
+	private int alpha = 255;
 	private TextureGraphicsContext context;
 	private boolean needsRedraw = true;
 	
@@ -72,11 +73,7 @@ public class Node {
 		    drawMe(context);
 		    for (Node subnode : childs) {
 		    	subnode.draw();
-		    	if (subnode.alpha == 255) {
-		    		context.drawTexture(new Point(subnode.getFrame().getLeft(), subnode.getFrame().getTop()), subnode.context.getTexture());	    		
-		    	} else {
-		    		context.drawTexture(new Point(subnode.getFrame().getLeft(), subnode.getFrame().getTop()), subnode.context.getTexture(), subnode.alpha);
-		    	}	
+		    	context.drawTexture(new Point(subnode.getFrame().getLeft(), subnode.getFrame().getTop()), subnode.context.getTexture(), subnode.alpha);	
 		    }
 			needsRedraw = false;
 		}
@@ -164,8 +161,18 @@ public class Node {
 		return context;
 	}
 	
-	public by.dev.gui.Runtime getRuntime() {
-		return getDesktop().getRuntime();
+	public Application getApplication() {
+		return getDesktop().getApplication();
 	}
+
+	public int getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(int alpha) {
+		this.alpha = alpha;
+		setNeedsRedraw();
+	}
+	
 	
 }
